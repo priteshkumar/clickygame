@@ -56,13 +56,18 @@ class Image extends Component {
   constructor(props){
   	super(props);
   	this.state = {isClicked:false};
+    this.handleClick = this.handleClick.bind(this);
   }
 
-  
+  handleClick(e){
+    console.log("image clicked");
+    this.props.clickHandler(this.props.datasrc);
+  }
+
   render() {
     return (
       <div className="Imgdiv">
-        <img src={this.props.datasrc} className="Img" onClick={this.props.clickhandler}/>
+        <img src={this.props.datasrc} className="Img" onClick={this.handleClick}/>
       </div>
       
     );
@@ -76,7 +81,7 @@ class Imagelist extends Component {
     var clickHandler = this.props.clickHandler;
 
     function createImages(item){
-      return <Image datasrc={item} clickhandler={clickHandler}/>
+      return <Image datasrc={item} clickHandler={clickHandler}/>
     }
 
     var imageList = images.map(createImages); 
@@ -107,10 +112,10 @@ class App extends Component {
         daysofstatic,daftpunk,
         astro,avicii,
         caspian,explosions];
-        
+        this.clickedImages = [];
  }
 
-generateImagelist(){
+generateImagelist(resetGame){
   this.imageArray = [];
   var ranindexarray = [];
   var uniqueIndex = 0;
@@ -135,15 +140,29 @@ generateImagelist(){
     }
   
   this.setState({imgList:this.imageArray,
-                  message:"you guessed correctly",
-                  score:this.state.score+1,
-                  topscore:this.state.topscore+1});
+                  message: resetGame === true ? "Wrong guess, game will be reset" : "You guessed correctly",
+                  score:resetGame === true ? 0 : this.state.score+1,
+                  topscore:resetGame === true ? this.state.topscore : this.state.score+1 > this.state.topscore ? this.state.score +1 : this.state.topscore});
 }
 
- handleClick(e){
+ handleClick(imgsrc){
+
    console.log("click event");
    console.log(this);
-  this.generateImagelist();
+   console.log(imgsrc);
+   var resetGame = false;
+   if(this.clickedImages.indexOf(imgsrc) === -1){
+      console.log("image not clicked");
+      this.clickedImages.push(imgsrc);
+   }
+   else{
+      console.log("image clicked already");
+      this.clickedImages = [];
+      resetGame = true;
+
+   }
+  this.generateImagelist(resetGame);
+ 
  }
 
   render() {
